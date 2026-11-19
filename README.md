@@ -6,8 +6,9 @@ User movie/series ka naam bhejta hai → bot **TMDB** se poster, rating, cast, *
 ## Folder structure
 ```
 bot.py  config.py  requirements.txt  Dockerfile  Procfile  .env.sample  README.md
-core/     db.py  tmdb.py  flow.py  helpers.py     (engine)
-plugins/  start.py  search.py  content.py  premium.py  admin.py   (commands)
+core/     db.py  tmdb.py  flow.py  helpers.py  fonts.py          (engine)
+plugins/  start.py  search.py  content.py  premium.py  admin.py
+          groups.py  extras.py  tools.py  font.py                (commands)
 ```
 
 ## 1) Kya-kya chahiye (ek baar)
@@ -34,6 +35,7 @@ Channel ID nikalne ke liye channel ka koi message @userinfobot / @RawDataBot ko 
 
 **Optional:** `AUTH_CHANNELS` (force-sub, space se IDs), `AUTH_REQ_CHANNELS` (join-request force-sub), `PREMIUM_LOGS`, `REQST_CHANNEL`,
 `QR_CODE` (image link), `OWNER_UPI_ID`, `OWNER_LNK`, `TRIAL_TIME` (e.g. `1hour`; khali = trial band), `PICS` (start photo links),
+`MOVIE_UPDATE_CHANNEL` (naya content add hote hi yahan auto post; `MOVIE_UPDATE_NOTIFICATION=True`), `MELCOW_NEW_USERS` + `MELCOW_PHOTO` (group welcome), `IMGBB_API_KEY` (/telegraph ke liye, imgbb.com se free), `REFER_POINTS` (10) `REFER_TARGET` (100) `REFER_PREMIUM` (1month), `TUTORIAL_2` `TUTORIAL_3`, `CARD_TEMPLATE`, `CONTENT_CAPTION`,
 `GRP_LNK`, `UPDATE_CHNL_LNK`, `AUTO_DELETE` / `DELETE_TIME`, `PROTECT_CONTENT`, `PM_SEARCH`, `GROUP_SEARCH`, `LANDSCAPE_POSTER`, `TMDB_LANG` (`en-US` / `hi-IN`),
 `URL` (Heroku/Koyeb/Render app URL — keep-alive), `PORT` (default 8080)
 
@@ -51,12 +53,25 @@ Channel ID nikalne ke liye channel ka koi message @userinfobot / @RawDataBot ko 
 4. Ek title par kai baar add karo → sab ek saath milega.
 Content search results me 📖 ke saath upar dikhta hai. `/demand` se pata chalta hai kis title ki demand hai par content nahi — pehle wahi banao.
 
-## 6) Admin commands
-`/addcontent /delcontent /contents /demand` • `/stats /users /chats` • `/broadcast /grp_broadcast /send` (reply karke)
-`/ban /unban /disable /enable /leave` • `/add_premium id 1month` `/remove_premium /premium_users /add_redeem 1day 5 /trial_reset`
-`/settings /verify on|off /set_shortner site api` (`_2`, `_3`) `/set_time 1200` `/set_time_2 54000` `/set_time valid 86400` `/set_tutorial link /pm_search on|off /group_search on|off /auto_delete on|off`
-`/delreq /logs /restart`
-(Shortener, verify on/off, gaps wagairah commands se badalte hi turant lagu — redeploy nahi chahiye.)
+## 6) Commands
+**Users:** `/start /trending /movies /series /trendlist(/top_search) /request /plan /myplan /refer /redeem /font /telegraph(/img,/cup) /id /info /stickerid /ping(/alive) /system /help /group_cmd`
+
+**Content (admin):** `/addcontent /delcontent /contents /demand /movie_update on|off /del_msg`
+
+**Admin:** `/stats /users /chats /broadcast /grp_broadcast /send` (reply karke) • `/ban /unban /disable /enable /leave /invite /clear_junk /junk_group`
+`/add_premium id 1month /remove_premium /get_premium /premium_users /add_redeem 1day 5 /trial_reset` • `/pm_search on|off /resetallgroup /delreq /logs /restart /set_commands /admin_cmd`
+
+**Settings — group admin group me, ya bot admin PM me (global):**
+`/settings` (toggle panel) • `/verify on|off` • `/set_shortner site api` (`_2`, `_3`) • `/set_time 1200` `/set_time_2 54000` `/set_time valid 86400`
+`/set_tutorial link` (`_2`, `_3`) • `/set_template` • `/set_caption` • `/set_fsub ids` • `/set_log_channel id` • `/reset_group`
+PM se group manage: group me `/connect` (ya `/reload`, `/details`), PM me `/connections` se active group chuno.
+Bina connect ke bot admin PM me jo set kare wo **global** hota hai; group ka apna set ho to wahi us group se aane walon par lagta hai.
+
+**Card template placeholders:** `{title} {year} {rating} {votes} {genres} {runtime} {lang} {director} {cast} {overview} {tagline} {status} {trailer} {imdb} {seasons}`
+Example: `/set_template 🎬 <b>{title}</b> ({year})\n⭐ {rating}\n{overview}`
+**Content caption:** `/set_caption {title} — Join @mychannel` (media content par lagta hai).
+
+(Shortener, verify, gaps wagairah commands se badalte hi turant lagu — redeploy nahi chahiye.)
 
 ## 7) User flow
 Naam bhejo → results → title → card (poster, rating, ▶️ Trailer, ⭐ IMDb, 📖 Read Now) → Read Now → force-sub check → shortener verify (premium users skip) → content, auto-delete ke saath.
@@ -65,5 +80,6 @@ Premium: Telegram Stars (`STAR_PREMIUM_PLANS` config.py me), UPI/QR, redeem code
 
 ## Note
 - Is bot me movie/video files nahi hain, na indexing/streaming. Sirf TMDB info + aapka content.
-- Original DreamXBotz ke hardcoded API_ID/channel IDs hata diye gaye hain — sab apni daalo.
-- Original ke removed extras: file indexing/stream server, font-style tool, telegraph uploader, per-group settings (ab settings global hain).
+- Original ke hardcoded API_ID, API_HASH, channel IDs aur imgbb key hata di gayi hain — sab apni daalo.
+- Original ke file-based features (file index, /delete, /deleteall, stream, /set_skip) is liye nahi hain kyunki files hain hi nahi.
+- Referral me sirf **naye** users count hote hain (fraud se bachne ke liye).
