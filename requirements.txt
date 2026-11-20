@@ -8,3 +8,4 @@ shortzy
 pytz
 psutil
 jinja2
+python-dotenv
